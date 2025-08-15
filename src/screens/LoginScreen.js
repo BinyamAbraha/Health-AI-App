@@ -8,14 +8,79 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../utils/firebaseConfig';
 import CustomButton from '../components/CustomButton';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = () => {
-    console.log('Login pressed');
+  const handleLogin = async () => {
+    // Clear previous errors
+    setErrorMessage('');
+    
+    // Validate input fields
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address');
+      return;
+    }
+    
+    if (!password.trim()) {
+      setErrorMessage('Please enter your password');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setErrorMessage('Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      await signInWithEmailAndPassword(auth, email.trim(), password);
+      // Navigation handled automatically by AuthContext
+      setErrorMessage('');
+    } catch (error) {
+      console.log('Login error:', error.code, error.message);
+      
+      // Handle specific Firebase Auth error codes
+      switch (error.code) {
+        case 'auth/invalid-credential':
+          setErrorMessage('Invalid email or password. Please check your credentials');
+          break;
+        case 'auth/user-not-found':
+          setErrorMessage('No account found with this email address');
+          break;
+        case 'auth/wrong-password':
+          setErrorMessage('Incorrect password');
+          break;
+        case 'auth/invalid-email':
+          setErrorMessage('Invalid email address');
+          break;
+        case 'auth/user-disabled':
+          setErrorMessage('This account has been disabled');
+          break;
+        case 'auth/too-many-requests':
+          setErrorMessage('Too many failed attempts. Please try again later');
+          break;
+        case 'auth/invalid-api-key':
+          setErrorMessage('Configuration error. Please check your Firebase setup');
+          break;
+        case 'auth/network-request-failed':
+          setErrorMessage('Network error. Please check your internet connection');
+          break;
+        default:
+          setErrorMessage(error.message || 'An error occurred during login');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {
@@ -75,10 +140,17 @@ const LoginScreen = ({ navigation }) => {
             />
           </View>
 
+          {errorMessage ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+          ) : null}
+
           <CustomButton
-            title="Log In"
+            title={isLoading ? "Signing In..." : "Log In"}
             onPress={handleLogin}
-            style={styles.loginButton}
+            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+            disabled={isLoading}
           />
 
           <TouchableOpacity onPress={handleForgotPassword}>
@@ -174,9 +246,27 @@ const styles = StyleSheet.create({
     color: '#000000',
     minHeight: 52,
   },
+  errorContainer: {
+    backgroundColor: '#FFF5F5',
+    borderWidth: 1,
+    borderColor: '#FEB2B2',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+    marginBottom: 12,
+  },
+  errorText: {
+    color: '#C53030',
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
   loginButton: {
     marginTop: 12,
     marginBottom: 20,
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
   },
   forgotPassword: {
     fontSize: 14,

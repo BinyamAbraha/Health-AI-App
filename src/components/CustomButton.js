@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const CustomButton = ({ title, onPress, style, textStyle, variant = 'primary' }) => {
+const CustomButton = ({ title, onPress, style, textStyle, variant = 'primary', disabled = false }) => {
   const buttonStyle = [
     styles.button,
     variant === 'primary' ? styles.primaryButton : styles.secondaryButton,
@@ -15,7 +15,11 @@ const CustomButton = ({ title, onPress, style, textStyle, variant = 'primary' })
   ];
 
   return (
-    <TouchableOpacity style={buttonStyle} onPress={onPress}>
+    <TouchableOpacity 
+      style={buttonStyle} 
+      onPress={disabled ? undefined : onPress}
+      disabled={disabled}
+    >
       <Text style={buttonTextStyle}>{title}</Text>
     </TouchableOpacity>
   );
