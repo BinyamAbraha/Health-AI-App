@@ -7,8 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import { signOut } from 'firebase/auth';
-import { auth } from '../utils/firebaseConfig';
 import HealthStatusCard from '../components/HealthStatusCard';
 import ToolButton from '../components/ToolButton';
 
@@ -25,13 +23,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     console.log(`${toolName} pressed`);
   };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut(auth);
-      // Navigation back to login handled automatically by AuthContext
-    } catch (error) {
-      console.log('Sign out error:', error.message);
-    }
+  const handleNavigateToSettings = () => {
+    navigation.navigate('SettingsScreen');
   };
 
   return (
@@ -49,8 +42,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <Text style={styles.subGreeting}>How can I help you today?</Text>
               </View>
             </View>
-            <TouchableOpacity style={styles.settingsButton} onPress={handleSignOut}>
-              <Text style={styles.settingsIcon}>↩️</Text>
+            <TouchableOpacity style={styles.settingsButton} onPress={handleNavigateToSettings}>
+              <Text style={styles.settingsIcon}>⚙️</Text>
             </TouchableOpacity>
           </View>
 
