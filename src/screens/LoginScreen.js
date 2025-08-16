@@ -44,8 +44,8 @@ const LoginScreen = ({ navigation }) => {
     
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      // Navigation handled automatically by AuthContext
       setErrorMessage('');
+      navigation.navigate('HomeScreen');
     } catch (error) {
       console.log('Login error:', error.code, error.message);
       
