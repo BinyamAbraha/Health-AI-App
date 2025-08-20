@@ -6,7 +6,9 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
+import { launchImagePicker, ImagePickerResponse, MediaType } from 'react-native-image-picker';
 import HealthStatusCard from '../components/HealthStatusCard';
 import ToolButton from '../components/ToolButton';
 
@@ -20,11 +22,37 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   const handleToolPress = (toolName: string) => {
-    console.log(`${toolName} pressed`);
+    if (toolName === 'Drug Checker') {
+      navigation.navigate('DrugCheckerScreen');
+    } else {
+      console.log(`${toolName} pressed`);
+    }
   };
 
   const handleNavigateToSettings = () => {
     navigation.navigate('SettingsScreen');
+  };
+
+  const handleCameraPress = () => {
+    const options = {
+      mediaType: 'photo' as MediaType,
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+    };
+
+    launchImagePicker(options, (response: ImagePickerResponse) => {
+      if (response.didCancel) {
+        console.log('User cancelled camera');
+      } else if (response.errorMessage) {
+        console.log('Camera Error: ', response.errorMessage);
+        Alert.alert('Error', 'Failed to open camera');
+      } else if (response.assets && response.assets.length > 0) {
+        const imageUri = response.assets[0].uri;
+        console.log('Blood pressure monitor photo taken: ', imageUri);
+        Alert.alert('Photo Captured', 'Blood pressure monitor photo saved successfully!');
+      }
+    });
   };
 
   return (
@@ -61,8 +89,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             lastUpdated="Last updated today"
             value="120/80"
             status="Normal range"
-            icon="💙"
+            icon="❤️"
             statusIcon="✅"
+            onCameraPress={handleCameraPress}
           />
 
           {/* Tools Section */}
