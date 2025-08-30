@@ -24,6 +24,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const handleToolPress = (toolName: string) => {
     if (toolName === 'Drug Checker') {
       navigation.navigate('DrugCheckerScreen');
+    } else if (toolName === 'Medications') {
+      navigation.navigate('MedicationScreen');
     } else {
       console.log(`${toolName} pressed`);
     }

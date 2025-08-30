@@ -8,9 +8,8 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../utils/firebaseConfig';
 import CustomButton from '../components/CustomButton';
+import { signIn, signUp } from '../utils/auth';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -43,41 +42,16 @@ const LoginScreen = ({ navigation }) => {
     setIsLoading(true);
     
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-      setErrorMessage('');
-      navigation.navigate('HomeScreen');
-    } catch (error) {
-      console.log('Login error:', error.code, error.message);
-      
-      // Handle specific Firebase Auth error codes
-      switch (error.code) {
-        case 'auth/invalid-credential':
-          setErrorMessage('Invalid email or password. Please check your credentials');
-          break;
-        case 'auth/user-not-found':
-          setErrorMessage('No account found with this email address');
-          break;
-        case 'auth/wrong-password':
-          setErrorMessage('Incorrect password');
-          break;
-        case 'auth/invalid-email':
-          setErrorMessage('Invalid email address');
-          break;
-        case 'auth/user-disabled':
-          setErrorMessage('This account has been disabled');
-          break;
-        case 'auth/too-many-requests':
-          setErrorMessage('Too many failed attempts. Please try again later');
-          break;
-        case 'auth/invalid-api-key':
-          setErrorMessage('Configuration error. Please check your Firebase setup');
-          break;
-        case 'auth/network-request-failed':
-          setErrorMessage('Network error. Please check your internet connection');
-          break;
-        default:
-          setErrorMessage(error.message || 'An error occurred during login');
+      const result = await signIn(email.trim(), password);
+      if (result.success) {
+        console.log('User signed in:', result.user);
+        navigation.navigate('HomeScreen');
+      } else {
+        setErrorMessage(result.message);
       }
+    } catch (error) {
+      console.log('Login error:', error.message);
+      setErrorMessage(error.message || 'An error occurred during login');
     } finally {
       setIsLoading(false);
     }
@@ -95,8 +69,44 @@ const LoginScreen = ({ navigation }) => {
     console.log('Apple sign in pressed');
   };
 
-  const handleCreateAccount = () => {
-    console.log('Create account pressed');
+  const handleCreateAccount = async () => {
+    // Clear previous errors
+    setErrorMessage('');
+    
+    // Validate input fields
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address');
+      return;
+    }
+    
+    if (!password.trim()) {
+      setErrorMessage('Please enter your password');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setErrorMessage('Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const result = await signUp(email.trim(), password);
+      if (result.success) {
+        console.log('User created:', result.user);
+        navigation.navigate('HomeScreen');
+      } else {
+        setErrorMessage(result.message);
+      }
+    } catch (error) {
+      console.log('Create account error:', error.message);
+      setErrorMessage(error.message || 'An error occurred while creating your account');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

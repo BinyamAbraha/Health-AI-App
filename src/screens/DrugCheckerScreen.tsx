@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import InteractionResultCard from '../components/InteractionResultCard';
-import { getMockUserMedications } from '../utils/firebaseConfig';
+import { getMedications } from '../services/medicationService';
 import { checkInteractions } from '../services/fdaService';
 
 interface DrugCheckerScreenProps {

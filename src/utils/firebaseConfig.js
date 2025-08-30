@@ -1,7 +1,5 @@
 // src/utils/firebaseConfig.js
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
 import {
   API_KEY,
   AUTH_DOMAIN,
@@ -34,12 +32,3 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize and export Firebase services for use in other parts of the app
-export const auth = getAuth(app);
-export const firestore = getFirestore(app);
-
-// Temporary mock function to provide placeholder medication data for testing
-// This will be replaced with real Firestore queries once the Medication Tracker is built
-export const getMockUserMedications = () => {
-  return ['Lisinopril', 'Metformin'];
-};

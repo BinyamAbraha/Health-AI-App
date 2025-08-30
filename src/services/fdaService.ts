@@ -1,5 +1,5 @@
 import { FDA_API_KEY } from '@env';
-import { getMockUserMedications } from '../utils/firebaseConfig';
+import { getMedications } from '../services/medicationService';
 
 // FDA Drug Interaction Service
 // This service will handle API calls to the openFDA drug/label.json endpoint
@@ -72,7 +72,8 @@ export const checkInteractions = async (newDrugName: string): Promise<Interactio
   }
 
   // Get list of saved medications
-  const savedDrugs = getMockUserMedications();
+  const savedMedications = await getMedications();
+  const savedDrugs = savedMedications.map(med => med.name);
   const results: InteractionResult[] = [];
 
   console.log('FDA API Key available:', !!FDA_API_KEY);
