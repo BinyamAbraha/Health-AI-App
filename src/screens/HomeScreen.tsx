@@ -8,7 +8,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { launchImagePicker, ImagePickerResponse, MediaType } from 'react-native-image-picker';
+import { launchImageLibrary, MediaType, ImagePickerResponse } from 'react-native-image-picker';
 import HealthStatusCard from '../components/HealthStatusCard';
 import ToolButton from '../components/ToolButton';
 
@@ -41,18 +41,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       includeBase64: false,
       maxHeight: 2000,
       maxWidth: 2000,
+      quality: 0.8 as any,
     };
 
-    launchImagePicker(options, (response: ImagePickerResponse) => {
+    launchImageLibrary(options, (response: ImagePickerResponse) => {
       if (response.didCancel) {
-        console.log('User cancelled camera');
+        console.log('User cancelled image selection');
       } else if (response.errorMessage) {
-        console.log('Camera Error: ', response.errorMessage);
-        Alert.alert('Error', 'Failed to open camera');
+        console.log('ImagePicker Error: ', response.errorMessage);
+        Alert.alert('Error', 'Failed to open image library');
       } else if (response.assets && response.assets.length > 0) {
         const imageUri = response.assets[0].uri;
-        console.log('Blood pressure monitor photo taken: ', imageUri);
-        Alert.alert('Photo Captured', 'Blood pressure monitor photo saved successfully!');
+        console.log('Blood pressure monitor photo selected: ', imageUri);
+        Alert.alert('Photo Selected', 'Blood pressure monitor photo selected successfully!');
       }
     });
   };
